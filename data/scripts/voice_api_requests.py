@@ -4,7 +4,7 @@ import os
 import sys
 import getopt
 
-def create_webhook_request():
+def create_webhook_request(token, server_url):
     try:
         response = requests.post(
             url="https://voice.messagebird.com/webhooks",
@@ -14,8 +14,8 @@ def create_webhook_request():
                 "Content-Type": "application/json",
             },
             data=json.dumps({
-                "url": ""+os.environ['server_url']+"",
-                "token": "foobar1234"
+                "url": ""+server_url+"",
+                "token": ""+token+""
             })
         )
         print('Response HTTP Status Code: {status_code}'.format(
@@ -26,12 +26,12 @@ def create_webhook_request():
         print('HTTP Request failed')
 
 
-def create_callflow_for_number_request():
+def create_callflow_for_number_request(number):
     # Create Call Flow for Number
 
     try:
         response = requests.post(
-            url="https://voice.messagebird.com/numbers/"+os.environ['phone_number']+"/call-flow",
+            url="https://voice.messagebird.com/numbers/"+number+"/call-flow",
             headers={
                 "Content-Type": "application/json; charset=utf-8",
                 "Authorization": "AccessKey " + os.environ['api_key'],
@@ -67,26 +67,36 @@ def create_callflow_for_number_request():
 def main(argv):
     try:
         opts, args = getopt.getopt(
-            argv, "hc:n:a:", ["callflow=", "number=", "action="])
+            argv, "ht:n:a:u:", ["webhooktoken=", "number=", "action=", "serverurl="])
     except getopt.GetoptError:
-        print ('voice_api_requests.py -h -a -c -n')
+        print ('voice_api_requests.py -h -w -n -a -u')
         sys.exit(2)
-    c,n,a = '','',''
+    t,n,a,u = '','','',''
     for opt, arg in opts:
         if opt == '-h':
-            print ('voice_api_requests -a -c -w -n')
+            print ('voice_api_requests.py -w -n -a -u')
             sys.exit()
-        elif opt in ("-c", "--callflow"):
-            c = arg
+        elif opt in ("-t", "--webhooktoken"):
+            t = arg
         elif opt in ("-n", "--number"):
             n = arg
         elif opt in ("-a", "--action"):
             a = arg
+        elif opt in ("-u", "--serverurl"):
+            u = arg
 
     if a == 'webhook':
-        create_webhook_request()
+        if u != "":
+            create_webhook_request(t,u)
+        else:
+            print ('No proper server url provided')
+            sys.exit(2)
     elif a == 'callflow':
-        create_callflow_for_number_request()
+        if n != "":
+            create_callflow_for_number_request(n)
+        else:
+            print ('No number provided')
+            sys.exit(2)
     else:
         print ('No proper action provided. Options are `webhook` or `callflow`')
         sys.exit(2)

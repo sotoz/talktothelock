@@ -1,0 +1,5 @@
+data/scripts/__pycache__
+data/scripts/files/incoming/*
+data/scripts/files/temp/*
+data/scripts/files/training/*
+!.gitignore

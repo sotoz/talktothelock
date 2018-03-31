@@ -1,7 +1,8 @@
 import requests
 import json
 import os
-
+import sys
+import getopt
 
 def create_webhook_request():
     try:
@@ -30,7 +31,7 @@ def create_callflow_for_number_request():
 
     try:
         response = requests.post(
-            url="https://voice.messagebird.com/numbers/"+os.environ['phone_number']"/call-flow",
+            url="https://voice.messagebird.com/numbers/"+os.environ['phone_number']+"/call-flow",
             headers={
                 "Content-Type": "application/json; charset=utf-8",
                 "Authorization": "AccessKey " + os.environ['api_key'],
@@ -63,27 +64,34 @@ def create_callflow_for_number_request():
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
 
-
-if __name__ == '__main__':
-    from sys import argv
+def main(argv):
     try:
         opts, args = getopt.getopt(
-            argv, "hcw:n:", ["attach_callflow=", "number="])
+            argv, "hc:n:a:", ["callflow=", "number=", "action="])
     except getopt.GetoptError:
-        print 'test.py -i <inputfile> -o <outputfile>'
+        print ('voice_api_requests.py -h -a -c -n')
         sys.exit(2)
+    c,n,a = '','',''
     for opt, arg in opts:
         if opt == '-h':
-            print 'test.py -i <inputfile> -o <outputfile>'
+            print ('voice_api_requests -a -c -w -n')
             sys.exit()
-        elif opt in ("-c", "--ifile"):
-            inputfile = arg
-        elif opt in ("-o", "--ofile"):
-            outputfile = arg
+        elif opt in ("-c", "--callflow"):
+            c = arg
+        elif opt in ("-n", "--number"):
+            n = arg
+        elif opt in ("-a", "--action"):
+            a = arg
 
-    if len(argv) == 2:
-        run(port=int(argv[1]))
+    if a == 'webhook':
+        create_webhook_request()
+    elif a == 'callflow':
+        create_callflow_for_number_request()
     else:
-        run()
+        print ('No proper action provided. Options are `webhook` or `callflow`')
+        sys.exit(2)
 
-create_callflow_for_number_request()
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
+   

@@ -64,4 +64,26 @@ def create_callflow_for_number_request():
         print('HTTP Request failed')
 
 
+if __name__ == '__main__':
+    from sys import argv
+    try:
+        opts, args = getopt.getopt(
+            argv, "hcw:n:", ["attach_callflow=", "number="])
+    except getopt.GetoptError:
+        print 'test.py -i <inputfile> -o <outputfile>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'test.py -i <inputfile> -o <outputfile>'
+            sys.exit()
+        elif opt in ("-c", "--ifile"):
+            inputfile = arg
+        elif opt in ("-o", "--ofile"):
+            outputfile = arg
+
+    if len(argv) == 2:
+        run(port=int(argv[1]))
+    else:
+        run()
+
 create_callflow_for_number_request()

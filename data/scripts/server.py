@@ -25,11 +25,9 @@ class HS(BaseHTTPRequestHandler):
 
         # post_data.json()
         j = json.loads(post_data.decode('utf-8'))
-        print (j)
         for i in j['items']:
-            
             if i['type'] == "call":
-                print("Found call: %s", i['payload']['id'])
+                print("Found call: %s" % i['payload']['id'])
 
         return
 
